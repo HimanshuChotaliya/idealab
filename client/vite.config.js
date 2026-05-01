@@ -6,17 +6,6 @@ export default defineConfig({
   plugins: [react()],
   build: {
     chunkSizeWarningLimit: 2000, // Increase warning limit to 2000kb
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          map: ['leaflet', 'react-leaflet'],
-          chart: ['recharts'],
-          mqtt: ['mqtt'],
-          qr: ['html5-qrcode', 'qrcode']
-        }
-      }
-    }
   },
   server: {
     port: 5173,
