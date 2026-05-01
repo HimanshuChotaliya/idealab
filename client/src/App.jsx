@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import RegisterContainer from './pages/RegisterContainer';
 import TrackContainer from './pages/TrackContainer';
+import SignContainer from './pages/SignContainer';
 import './index.css';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/register" element={<RegisterContainer />} />
             <Route path="/track" element={<TrackContainer />} />
+            <Route path="/sign" element={<SignContainer />} />
           </Routes>
         </Layout>
       </BrowserRouter>

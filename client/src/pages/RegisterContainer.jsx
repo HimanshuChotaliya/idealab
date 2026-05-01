@@ -7,11 +7,8 @@ export default function RegisterContainer() {
   const [label, setLabel] = useState('');
   const [code, setCode] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
-  const [status, setStatus] = useState('Connecting...');
   const [error, setError] = useState('');
   const canvasRef = useRef(null);
-  const wsRef = useRef(null);
-  const watchIdRef = useRef(null);
 
   const handleRegister = (e) => {
     e.preventDefault();
@@ -20,42 +17,14 @@ export default function RegisterContainer() {
     setCode(generatedCode);
     setIsRegistered(true);
     setError('');
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
-    wsRef.current = ws;
-    ws.onopen = () => {
-      ws.send(JSON.stringify({ type: 'register', roomCode: generatedCode, containerLabel: label.trim() }));
-      startTracking(ws, generatedCode);
-    };
-    ws.onerror = () => setError('Failed to connect to tracking server.');
   };
 
   useEffect(() => {
     if (isRegistered && code && canvasRef.current) {
-      QRCode.toCanvas(canvasRef.current, code, { width: 220, margin: 2, color: { dark: '#10B981', light: '#ffffff' } });
+      const signUrl = `${window.location.origin}/sign?code=${code}`;
+      QRCode.toCanvas(canvasRef.current, signUrl, { width: 220, margin: 2, color: { dark: '#10B981', light: '#ffffff' } });
     }
   }, [isRegistered, code]);
-
-  useEffect(() => {
-    return () => {
-      if (watchIdRef.current) navigator.geolocation.clearWatch(watchIdRef.current);
-      if (wsRef.current?.readyState === WebSocket.OPEN) wsRef.current.close();
-    };
-  }, []);
-
-  const startTracking = (ws, roomCode) => {
-    if (!navigator.geolocation) { setError('Geolocation not supported'); return; }
-    watchIdRef.current = navigator.geolocation.watchPosition(
-      (pos) => {
-        setStatus('Broadcasting live...');
-        if (ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({ type: 'location', roomCode, lat: pos.coords.latitude, lng: pos.coords.longitude }));
-        }
-      },
-      (err) => setError(`GPS Error: ${err.message}`),
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
-    );
-  };
 
   return (
     <div className="flow-container">
@@ -85,16 +54,15 @@ export default function RegisterContainer() {
       ) : (
         <div className="card" style={{ textAlign: 'center' }}>
           <p className="info-text" style={{ marginBottom: '1.5rem' }}>
-            Show this to the resident — they can <strong>scan the QR</strong> or type the code below.
+            Show this to the delivery agent — they can <strong>scan the QR</strong> or type the code below.
           </p>
           <div style={{ background: 'white', display: 'inline-flex', padding: '1.25rem', borderRadius: '1rem', marginBottom: '1rem' }}>
             <canvas ref={canvasRef} style={{ maxWidth: '100%' }} />
           </div>
           <div className="code-display">{code}</div>
-          <div className="pulse-container">
-            <div className="pulse-dot" />
-            <span className="pulse-text">{status}</span>
-          </div>
+          <Link to="/track" className="btn btn-secondary" style={{ display: 'block', marginTop: '1rem' }}>
+            Track this Container
+          </Link>
         </div>
       )}
     </div>

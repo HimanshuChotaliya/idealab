@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import L from 'leaflet';
+import mqtt from 'mqtt';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -36,29 +37,38 @@ export default function TrackContainer() {
 
   const connect = (code) => {
     setError('');
-    fetch(`/api/room/${code}`)
-      .then(r => { if (!r.ok) throw new Error('Invalid code — no active container found'); return r.json(); })
-      .then(data => {
-        setIsSuccess(true);
-        setTimeout(() => {
-          setIsSuccess(false);
-          setContainerLabel(data.containerLabel);
-          const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-          const ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
-          wsRef.current = ws;
-          ws.onopen = () => { setIsTracking(true); setSignalLost(false); ws.send(JSON.stringify({ type: 'watch', roomCode: code })); };
-          ws.onmessage = ({ data }) => {
-            try {
-              const msg = JSON.parse(data);
-              if (msg.type === 'location') { setPosition([msg.lat, msg.lng]); lastUpdateRef.current = Date.now(); setLastUpdated(0); setSignalLost(false); }
-              if (msg.type === 'container_offline') setSignalLost(true);
-            } catch (_) {}
-          };
-          ws.onclose = () => setSignalLost(true);
-          ws.onerror = () => setError('Connection error — please retry');
-        }, 900);
-      })
-      .catch(e => { setError(e.message); setIsTracking(false); });
+    setIsSuccess(true);
+    setTimeout(() => {
+      setIsSuccess(false);
+      setContainerLabel(`Container ${code}`);
+      
+      const client = mqtt.connect('wss://test.mosquitto.org:8081/mqtt');
+      wsRef.current = client;
+      
+      client.on('connect', () => {
+        setIsTracking(true);
+        setSignalLost(false);
+        client.subscribe(`packcycle/room/${code}`);
+      });
+      
+      client.on('message', (topic, message) => {
+        try {
+          const msg = JSON.parse(message.toString());
+          if (msg.lat && msg.lng) {
+            setPosition([msg.lat, msg.lng]);
+            lastUpdateRef.current = Date.now();
+            setLastUpdated(0);
+            setSignalLost(false);
+          }
+        } catch (_) {}
+      });
+      
+      client.on('close', () => setSignalLost(true));
+      client.on('error', () => {
+        setError('Connection error — please retry');
+        setSignalLost(true);
+      });
+    }, 900);
   };
 
   useEffect(() => {
@@ -80,7 +90,7 @@ export default function TrackContainer() {
     return () => { scannerRef.current?.clear().catch(() => {}); };
   }, [tab, isTracking]);
 
-  useEffect(() => () => { wsRef.current?.close(); clearInterval(timerRef.current); }, []);
+  useEffect(() => () => { wsRef.current?.end(); clearInterval(timerRef.current); }, []);
 
   const handleOtp = (i, v) => {
     if (!/^\d*$/.test(v)) return;
