@@ -54,7 +54,7 @@ export default function RegisterContainer() {
       ) : (
         <div className="card" style={{ textAlign: 'center' }}>
           <p className="info-text" style={{ marginBottom: '1.5rem' }}>
-            Show this to the delivery agent — they can <strong>scan the QR</strong> or type the code below.
+            Show this to the resident — they can <strong>scan the QR</strong> or type the code below.
           </p>
           <div style={{ background: 'white', display: 'inline-flex', padding: '1.25rem', borderRadius: '1rem', marginBottom: '1rem' }}>
             <canvas ref={canvasRef} style={{ maxWidth: '100%' }} />

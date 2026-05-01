@@ -37,8 +37,8 @@ export default function LandingPage() {
             <Link to="/login" className="btn btn-primary">
               Get Started <ArrowRight size={18} />
             </Link>
-            <Link to="/track" className="btn btn-secondary">
-              Track a Container
+            <Link to="/sign" className="btn btn-secondary">
+              Share Container Location
             </Link>
           </div>
         </div>

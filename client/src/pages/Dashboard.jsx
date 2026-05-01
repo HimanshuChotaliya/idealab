@@ -58,7 +58,10 @@ export default function Dashboard() {
           <h1>Platform Dashboard</h1>
           <p>Real-time view of your circular logistics network, {user?.name}.</p>
         </div>
-        <Link to="/register" className="btn btn-primary">+ Register Container</Link>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <Link to="/track" className="btn btn-secondary">Track Container</Link>
+          <Link to="/register" className="btn btn-primary">+ Register Container</Link>
+        </div>
       </div>
 
       <div className="stats-grid">
