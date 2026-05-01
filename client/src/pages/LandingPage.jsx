@@ -34,11 +34,11 @@ export default function LandingPage() {
             PackCycle eliminates single-use packaging by giving every reusable container a live digital identity — trackable by residents, managed by admins, proven by data.
           </p>
           <div className="hero-btns">
-            <Link to="/login" className="btn btn-primary">
-              Get Started <ArrowRight size={18} />
-            </Link>
-            <Link to="/sign" className="btn btn-secondary">
+            <Link to="/sign" className="btn btn-primary" style={{ padding: '0.875rem 2.5rem' }}>
               Share Container Location
+            </Link>
+            <Link to="/login" className="btn btn-secondary">
+              Admin Access <ArrowRight size={18} />
             </Link>
           </div>
         </div>
@@ -74,10 +74,15 @@ export default function LandingPage() {
       {/* CTA */}
       <section className="cta-section">
         <span className="section-eyebrow">Ready to go green?</span>
-        <h2>Start tracking containers today.</h2>
-        <Link to="/login" className="btn btn-primary" style={{ padding: '1rem 3rem', fontSize: '1.05rem' }}>
-          Launch Platform <ArrowRight size={18} />
-        </Link>
+        <h2>Join the circular economy today.</h2>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}>
+          <Link to="/sign" className="btn btn-primary" style={{ padding: '1rem 3rem', fontSize: '1.05rem' }}>
+            Share Location
+          </Link>
+          <Link to="/login" className="btn btn-secondary" style={{ padding: '1rem 3rem', fontSize: '1.05rem' }}>
+            Admin Portal
+          </Link>
+        </div>
       </section>
     </div>
   );

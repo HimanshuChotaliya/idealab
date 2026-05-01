@@ -17,7 +17,7 @@ export function Navbar() {
         {user ? (
           <>
             {user.role === 'admin' && <Link to="/dashboard" className="nav-link"><LayoutDashboard size={14} style={{ display:'inline', marginRight:'0.3rem', verticalAlign:'middle' }} />Dashboard</Link>}
-            <Link to="/track" className="nav-link">Track</Link>
+            {user.role === 'admin' && <Link to="/track" className="nav-link">Track</Link>}
             <div className="user-pill">
               <User size={14} color="var(--primary)" />
               <span>{user.name}</span>
